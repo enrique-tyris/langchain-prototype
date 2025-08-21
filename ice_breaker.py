@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 from langchain.prompts.prompt import PromptTemplate
-from langchain_openai import ChatOpenAI
+from langchain_google_vertexai import VertexAI
+import os
 
 from third_parties.linkedin import scrape_linkedin_profile
 from agents.linkedin_lookup_agent import lookup as linkedin_lookup_agent
@@ -19,7 +20,10 @@ def ice_break_with(name: str) -> str:
         input_variables=["information"], template=summary_template
     )
 
-    llm = ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo")
+    llm = VertexAI(
+        model_name=os.environ["CHAT_MODEL"],
+        temperature=0
+    )
 
     chain = summary_prompt_template | llm
 
