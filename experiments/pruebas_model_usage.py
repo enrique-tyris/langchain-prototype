@@ -38,38 +38,3 @@ print("==============================")
 print("==============================")
 print("\n=== Respuesta del modelo ===")
 print(output.content)
-
-
-
-
-
-#-------------------------------------
-# Cargar el modelo de embeddings de texto
-text_embedding_model = TextEmbeddingModel.from_pretrained("text-embedding-004")
-
-# params para cuota
-block_size = 35
-sleep_time = 6
-
-# Función para obtener embeddings de texto con reintentos
-def get_text_embedding_from_text_embedding_model(text: str, return_array: bool = False, max_intentos=5) -> list:
-    intento = 1
-    espera = 5  # Tiempo inicial de espera en segundos
-
-    while intento <= max_intentos:
-        try:
-            embeddings = text_embedding_model.get_embeddings([text])
-            text_embedding = [embedding.values for embedding in embeddings][0]
-
-            if return_array:
-                text_embedding = np.fromiter(text_embedding, dtype=float)
-
-            return text_embedding  # Retorna el embedding si se obtiene correctamente
-        except Exception as e:  # Captura el error
-            print(f"Error al obtener el embedding para el texto: {text}. Intento {intento} de {max_intentos}. Error: {e}. Esperando {espera} segundos...")
-            time.sleep(espera)
-            espera *= 2  # Aumenta el tiempo de espera exponencialmente
-            intento += 1
-
-    print(f"Error persistente al obtener el embedding para el texto: {text} después de {max_intentos} intentos.")
-    return None  # Retorna None si todos los intentos fallan
