@@ -4,9 +4,12 @@ from dotenv import load_dotenv
 import vertexai
 from langchain_google_vertexai import VertexAIEmbeddings
 
-def get_embedding_function():
+def get_embedding_function(debug=False):
     """
     Creates and returns a VertexAI embedding function.
+    
+    Args:
+        debug (bool): If True, prints debug logs. Defaults to False.
     
     Returns:
         VertexAIEmbeddings: The embedding function instance
@@ -16,10 +19,12 @@ def get_embedding_function():
     # Get the project root directory (parent of database/)
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     env_path = os.path.join(project_root, '.env')
-    print(f"[LOG] Buscando .env en: {env_path}")
+    if debug:
+        print(f"[LOG] Buscando .env en: {env_path}")
     load_dotenv(env_path)
     t1 = time.time()
-    print(f"[LOG] Tiempo en cargar variables .env: {t1 - t0:.2f} s")
+    if debug:
+        print(f"[LOG] Tiempo en cargar variables .env: {t1 - t0:.2f} s")
 
     if not os.getenv("GOOGLE_CLOUD_PROJECT"):
         raise ValueError("GOOGLE_CLOUD_PROJECT environment variable is not set")
@@ -30,18 +35,20 @@ def get_embedding_function():
         project=os.getenv("GOOGLE_CLOUD_PROJECT"),
         location="europe-west1"  # Using same region as working example
     )
-    print('\n')
+    if debug:
+        print('\n')
     # Create embeddings client
     embeddings = VertexAIEmbeddings(os.getenv("EMBEDDING_MODEL"))  # Using default model that worked in your environment
     t3 = time.time()
-    print('\n')
-    print(f"[LOG] Tiempo en inicializar Vertex AI + modelo: {t3 - t2:.2f} s")
+    if debug:
+        print('\n')
+        print(f"[LOG] Tiempo en inicializar Vertex AI + modelo: {t3 - t2:.2f} s")
     return embeddings
 
 if __name__ == "__main__":
     try:
-        # Get the embedding function
-        embedding_function = get_embedding_function()
+        # Get the embedding function with debug enabled
+        embedding_function = get_embedding_function(debug=True)
         
         # 🔹 Llamada dummy para calentar (no medimos cold start aparte)
         print("[LOG] Ejecutando llamada dummy para evitar cold start...")
