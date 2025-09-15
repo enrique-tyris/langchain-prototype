@@ -41,7 +41,7 @@ if __name__ == "__main__":
     index = pc.Index(index_name)
 
     # Obtener función de embeddings desde el módulo embeddings.py
-    from database.embeddings import get_embedding_function
+    from database.rag.embeddings import get_embedding_function
     embedding_function = get_embedding_function()
 
     # Inicializar almacén de vectores

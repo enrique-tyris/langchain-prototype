@@ -16,8 +16,8 @@ def get_embedding_function(debug=False):
     """
     # Load environment variables (.env with GOOGLE_CLOUD_PROJECT and credentials)
     t0 = time.time()
-    # Get the project root directory (parent of database/)
-    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    # Get the project root directory (parent of database/rag/)
+    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     env_path = os.path.join(project_root, '.env')
     if debug:
         print(f"[LOG] Buscando .env en: {env_path}")

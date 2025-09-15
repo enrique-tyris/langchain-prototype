@@ -11,7 +11,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.schema.document import Document
 
 # Load environment variables
-env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env')
+env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), '.env')
 load_dotenv(env_path)
 
 # Initialize Vertex AI for embeddings
