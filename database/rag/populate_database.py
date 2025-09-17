@@ -23,7 +23,7 @@ vertexai.init(
 
 # Initialize Pinecone
 pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
-INDEX_NAME = os.getenv("PINECONE_INDEX_NAME", "prototipo-3-onayu-longerchunks")
+INDEX_NAME = os.getenv("PINECONE_INDEX_NAME")
 
 # Constants for document processing
 CHUNK_SIZE = 3000

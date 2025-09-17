@@ -19,7 +19,7 @@ embedding_function = get_embedding_function()
 # Inicializar Pinecone
 pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
 
-index_name = "prototipo-3-onayu-longerchunks"
+index_name = os.getenv("PINECONE_INDEX_NAME")
 index = pc.Index(index_name)
 
 # Conectar el índice a LangChain

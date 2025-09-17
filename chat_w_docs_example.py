@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     # Inicializar Pinecone
     pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
-    index_name = "prototipo-3-onayu-longerchunks"  # Usando el mismo índice que en query_rag.py
+    index_name = os.getenv("PINECONE_INDEX_NAME")
     index = pc.Index(index_name)
 
     # Obtener función de embeddings desde el módulo embeddings.py
