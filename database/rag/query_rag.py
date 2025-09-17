@@ -30,13 +30,16 @@ selected_namespace = None
 
 # === Función de consulta interactiva ===
 def print_document_result(doc, index):
-    """Imprime un documento resultado de forma formateada."""
+    """Imprime un documento resultado de forma fija."""
+    meta = getattr(doc, "metadata", {}) or {}
+    text = getattr(doc, "page_content", None) or meta.get("text", "")
+
     print(f"\n📄 Documento {index + 1}")
     print("=" * 80)
-    print(f"Fuente: {doc.metadata.get('source', 'Desconocido')}")
-    print(f"Página: {doc.metadata.get('page', 'N/A')}")
+    print(f"Fuente: {meta.get('source', 'Desconocido')}")
+    print(f"Páginas: {int(meta.get('page_start', 'N/A'))} - {int(meta.get('page_end', 'N/A'))}")
     print("-" * 80)
-    print(doc.page_content)
+    print(text)
     print("=" * 80)
 
 def select_namespace():
@@ -45,7 +48,7 @@ def select_namespace():
     
     print("\n🔍 Bienvenido al sistema de consulta de documentos")
     print("\n📋 Primero, selecciona el documento que quieres consultar:")
-    print("   Ejemplo: 824, 825, 844, 854, 855")
+    print("   Ejemplo: 824, 825, 855")
     
     while True:
         namespace_input = input("\n📄 Ingresa el número del documento: ").strip()

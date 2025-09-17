@@ -61,7 +61,7 @@ if __name__ == "__main__":
         
         print("\n🔍 Bienvenido al chat con documentos")
         print("\n📋 Primero, selecciona el documento que quieres consultar:")
-        print("   Ejemplo: 824, 825, 844, 854, 855")
+        print("   Ejemplo: 824, 825, 855")
         
         while True:
             namespace_input = input("\n📄 Ingresa el número del documento: ").strip()
