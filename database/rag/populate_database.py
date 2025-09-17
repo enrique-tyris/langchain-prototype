@@ -22,11 +22,11 @@ vertexai.init(
 
 # Initialize Pinecone
 pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
-INDEX_NAME = os.getenv("PINECONE_INDEX_NAME", "prototipo-2-onayu")
+INDEX_NAME = os.getenv("PINECONE_INDEX_NAME", "prototipo-3-onayu-longerchunks")
 
 # Constants for document processing
-CHUNK_SIZE = 500
-CHUNK_OVERLAP = 50
+CHUNK_SIZE = 3000
+CHUNK_OVERLAP = 400
 DATA_PATH = os.getenv("PDF_DATA_PATH", "data/raw")
 
 def main():
@@ -56,7 +56,7 @@ def main():
 def load_documents() -> List[Document]:
     """Load PDF documents from the data directory."""
     print(f"📚 Loading PDF documents from {DATA_PATH}")
-    document_loader = PyPDFDirectoryLoader(DATA_PATH)
+    document_loader = PyPDFDirectoryLoader(DATA_PATH, mode='single')
     return document_loader.load()
 
 def split_documents(documents: List[Document]) -> List[Document]:
@@ -96,41 +96,55 @@ def prepare_chunks_for_pinecone(chunks: List[Document]) -> List[Document]:
     return processed_chunks
 
 def upload_to_pinecone(chunks: List[Document], index, embedding_function) -> None:
-    """Upload document chunks to Pinecone."""
-    print("⬆️ Uploading chunks to Pinecone")
+    """Upload document chunks to Pinecone with namespaces per document."""
+    print("⬆️ Uploading chunks to Pinecone with namespaces")
     
-    # Create vector store
-    vectorstore = PineconeVectorStore(
-        index=index,
-        embedding=embedding_function,
-        text_key="text"
-    )
-    
-    # Prepare vectors for upload
-    vectors = []
+    # Group chunks by document source
+    chunks_by_document = {}
     for chunk in chunks:
-        # Generate embedding for the chunk
-        embedding = embedding_function.embed_query(chunk.page_content)
+        source = chunk.metadata.get("source", "unknown")
+        doc_name = os.path.basename(source).replace('.pdf', '').replace(' ', '_')
         
-        # Create vector record
-        vector = {
-            "id": chunk.metadata["id"],
-            "values": embedding,
-            "metadata": {
-                "text": chunk.page_content,
-                "source": chunk.metadata["source"],
-                "page": chunk.metadata["page"],
-                "chunk_index": chunk.metadata["chunk_index"]
-            }
-        }
-        vectors.append(vector)
+        if doc_name not in chunks_by_document:
+            chunks_by_document[doc_name] = []
+        chunks_by_document[doc_name].append(chunk)
     
-    # Upload in batches
-    batch_size = 15
-    for i in range(0, len(vectors), batch_size):
-        batch = vectors[i:i + batch_size]
-        index.upsert(vectors=batch)
-        print(f"Uploaded {min(i + batch_size, len(vectors))}/{len(vectors)} vectors")
+    # Process each document separately
+    total_uploaded = 0
+    for doc_name, doc_chunks in chunks_by_document.items():
+        print(f"📄 Processing document: {doc_name} ({len(doc_chunks)} chunks)")
+        
+        # Prepare vectors for this document
+        vectors = []
+        for chunk in doc_chunks:
+            # Generate embedding for the chunk
+            embedding = embedding_function.embed_query(chunk.page_content)
+            
+            # Create vector record
+            vector = {
+                "id": chunk.metadata["id"],
+                "values": embedding,
+                "metadata": {
+                    "text": chunk.page_content,
+                    "source": chunk.metadata["source"],
+                    "page": chunk.metadata["page"],
+                    "chunk_index": chunk.metadata["chunk_index"]
+                }
+            }
+            vectors.append(vector)
+        
+        # Upload to Pinecone with namespace
+        batch_size = 15
+        for i in range(0, len(vectors), batch_size):
+            batch = vectors[i:i + batch_size]
+            index.upsert(vectors=batch, namespace=doc_name)
+            uploaded_count = min(i + batch_size, len(vectors))
+            print(f"   ✅ Uploaded {uploaded_count}/{len(vectors)} vectors to namespace '{doc_name}'")
+        
+        total_uploaded += len(vectors)
+        print(f"🎉 Document '{doc_name}' completed: {len(vectors)} vectors uploaded")
+    
+    print(f"🚀 Total uploaded: {total_uploaded} vectors across {len(chunks_by_document)} namespaces")
 
 
 if __name__ == "__main__":
