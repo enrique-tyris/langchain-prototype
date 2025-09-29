@@ -30,7 +30,7 @@ if __name__ == "__main__":
 
     # Inicializar modelo Gemini
     llm = ChatVertexAI(
-        model="gemini-2.5-flash-lite",
+        model=os.getenv("CHAT_MODEL"),
         max_output_tokens=200
     )
     print("✨ Modelo inicializado")
