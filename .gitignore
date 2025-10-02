@@ -132,3 +132,12 @@ dmypy.json
 
 # Files
 *.pdf
+*.csv
+*.xlsx
+*.xls
+*.xlsm
+*.xlsb
+*.xlsm
+*.xlsb
+*.xlsm
+*.xlsb
