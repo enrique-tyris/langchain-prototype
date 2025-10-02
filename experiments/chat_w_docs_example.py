@@ -1,7 +1,14 @@
 import os
+import sys
 import time
 import warnings
 from dotenv import load_dotenv
+
+# Configurar path y variables de entorno al inicio
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(project_root)  # Agregar la raíz del proyecto al path
+env_path = os.path.join(project_root, '.env')
+load_dotenv(env_path)
 
 # Suprimir warnings específicos
 warnings.filterwarnings("ignore", category=UserWarning, module="vertexai._model_garden._model_garden_models")
@@ -15,10 +22,6 @@ from langchain import hub
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains.retrieval import create_retrieval_chain
 
-# Load environment variables
-env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
-load_dotenv(env_path)
-
 # Initialize Vertex AI
 vertexai.init(
     project=os.getenv("GOOGLE_CLOUD_PROJECT"),
@@ -31,7 +34,7 @@ if __name__ == "__main__":
     # Inicializar modelo Gemini
     llm = ChatVertexAI(
         model=os.getenv("CHAT_MODEL"),
-        max_output_tokens=200
+        max_output_tokens=1000
     )
     print("✨ Modelo inicializado")
 

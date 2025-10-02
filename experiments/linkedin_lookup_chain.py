@@ -10,7 +10,7 @@ from langchain.agents import (
     AgentExecutor,
 )
 from langchain import hub
-from tools.tools import get_profile_url_tavily
+from tools.langchain_course_tools import get_profile_url_tavily
 
 
 def lookup(name: str) -> str:
